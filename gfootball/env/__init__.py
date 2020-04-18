@@ -99,7 +99,8 @@ def create_environment(env_name='',
                        number_of_right_players_agent_controls=0,
                        channel_dimensions=(
                            observation_preprocessing.SMM_WIDTH,
-                           observation_preprocessing.SMM_HEIGHT)):
+                           observation_preprocessing.SMM_HEIGHT),
+                       other_config_options={}):
   """Creates a Google Research Football environment.
 
   Args:
@@ -168,6 +169,7 @@ def create_environment(env_name='',
         controls.
     channel_dimensions: (width, height) tuple that represents the dimensions of
        SMM or pixels representation.
+    other_config_options: dict that will be passed directly into Config constructor.
   Returns:
     Google Research Football environment.
   """
@@ -177,14 +179,17 @@ def create_environment(env_name='',
       number_of_right_players_agent_controls))]
   if extra_players is not None:
     players.extend(extra_players)
-  c = config.Config({
+  config_values = {
       'dump_full_episodes': write_full_episode_dumps,
       'dump_scores': write_goal_dumps,
       'players': players,
       'level': env_name,
       'tracesdir': logdir,
-      'write_video': write_video,
-  })
+      'write_video': write_video
+  }
+  config_values.update(other_config_options)
+
+  c = config.Config(config_values)
   env = football_env.FootballEnv(c)
   if render:
     env.render()

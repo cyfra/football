@@ -155,17 +155,21 @@ class ActiveDump(object):
     self._step_cnt = 0
     self._last_frame_time = 0
     self._dump_file = None
+
+    self._video_suffix = '.webm' if config['video_format'] == 'webm' else '.avi'
+
     if config['write_video']:
-      self._video_fd, self._video_tmp = tempfile.mkstemp(suffix='.avi')
+      self._video_fd, self._video_tmp = tempfile.mkstemp(suffix=self._video_suffix)
       if config['video_quality_level'] == 2:
         self._frame_dim = (1280, 720)
-        fcc = cv2.VideoWriter_fourcc('p', 'n', 'g', ' ')
+        default_fcc = cv2.VideoWriter_fourcc('p', 'n', 'g', ' ')
       elif config['video_quality_level'] == 1:
-        fcc = cv2.VideoWriter_fourcc(*'MJPG')
+        default_fcc = cv2.VideoWriter_fourcc(*'MJPG')
         self._frame_dim = (1280, 720)
       else:
-        fcc = cv2.VideoWriter_fourcc(*'XVID')
+        default_fcc = cv2.VideoWriter_fourcc(*'XVID')
         self._frame_dim = (800, 450)
+      fcc = cv2.VideoWriter_fourcc(*'vp80') if config['video_format'] == 'webm' else default_fcc
       self._video_writer = cv2.VideoWriter(
           self._video_tmp, fcc,
           const.PHYSICS_STEPS_PER_SECOND / config['physics_steps_per_frame'],
@@ -252,8 +256,8 @@ class ActiveDump(object):
       try:
         # For some reason sometimes the file is missing, so the code fails.
         if WRITE_FILES:
-          shutil.copy2(self._video_tmp, self._name + '.avi')
-        logging.info('Video written to %s.avi', self._name)
+          shutil.copy2(self._video_tmp, self._name + self._video_suffix)
+        logging.info('Video written to %s%s', self._name, self._video_suffix)
         os.remove(self._video_tmp)
       except:
         logging.error(traceback.format_exc())

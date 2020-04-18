@@ -91,6 +91,10 @@ class Config(object):
         'real_time': False,
         'tracesdir': '/tmp/dumps',
         'video_quality_level': 0,  # 0 - low, 1 - medium, 2 - high
+        # Choose video format: 'default' (.avi) or 'webm' (for colab notebooks)
+        #   webm is natively readable by web browsers, but encoder is more 
+        #   expensive (and might slow down your machine)
+        'video_format': 'default',
         'write_video': False
     }
     if values:
