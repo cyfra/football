@@ -60,6 +60,8 @@ class DumpConfig(object):
     self._last_dump_time = 0
     self._active_dump = None
     self._min_frequency = min_frequency
+    # List of dumps that were written for a given config.
+    self._dump_names = []
 
 
 class TextWriter(object):
@@ -406,6 +408,7 @@ class ObservationProcessor(object):
         self._dump_directory)
     config._active_dump = ActiveDump(dump_name,
         self._frame + config._steps_after, self._config)
+    config._dump_names.append(dump_name)
     for step in list(self._trace)[-config._steps_before:]:
       config._active_dump.add_step(step)
       for frame in step._additional_frames:
